@@ -10,6 +10,7 @@ public class Snake {
 
     ArrayList<Point> theSnake = new ArrayList<>();
     Point lastPoint = new Point(340,300);
+    int snakeSize;
 
 
     public Snake(){
@@ -19,6 +20,7 @@ public class Snake {
         theSnake.add(new Point(320,300));
         theSnake.add(new Point(330,300));
         theSnake.add(new Point(340,300));
+        snakeSize = 5;
 
 
     }
@@ -30,10 +32,14 @@ public class Snake {
 
     }
 
-    public void addPoint(){
+    public void addHead(){
         Point newPoint = new Point((int)(lastPoint.getxCord()+10),300);
         theSnake.add(newPoint);
         lastPoint = newPoint;
+    }
+
+    public void removeTail(){
+        theSnake.remove(0);
     }
 
 

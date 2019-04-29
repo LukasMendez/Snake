@@ -51,8 +51,10 @@ public class Main extends Application {
 
             public void handle(long now) {
                 if (now - lastUpdate >= 50000000) {
+                    clearCanvas();
                     drawSnake();
-                    snake.addPoint();
+                    snake.addHead();
+                    snake.removeTail();
                     lastUpdate = now ;
                 }
             }
@@ -60,7 +62,6 @@ public class Main extends Application {
 
         primaryStage.setScene(scene);
         primaryStage.show();
-
 
     }
 
@@ -85,6 +86,9 @@ public class Main extends Application {
 
     }
 
+    private void clearCanvas(){
+        gc.clearRect(0,0,700,700);
+    }
 
 
 
