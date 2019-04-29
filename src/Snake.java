@@ -9,6 +9,7 @@ import java.util.ArrayList;
 public class Snake {
 
     ArrayList<Point> theSnake = new ArrayList<>();
+    Point lastPoint = new Point(340,300);
 
 
     public Snake(){
@@ -29,6 +30,11 @@ public class Snake {
 
     }
 
+    public void addPoint(){
+        Point newPoint = new Point((int)(lastPoint.getxCord()+10),300);
+        theSnake.add(newPoint);
+        lastPoint = newPoint;
+    }
 
 
 
