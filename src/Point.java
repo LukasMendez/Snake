@@ -8,6 +8,8 @@ import static javafx.scene.paint.Color.RED;
  */
 public class Point {
 
+
+
     private double xCord;
     private double yCord;
 
@@ -24,6 +26,17 @@ public class Point {
     }
 
 
+    public void setxCord(double xCord) {
+        this.xCord = xCord;
+    }
+
+    public void setyCord(double yCord) {
+        this.yCord = yCord;
+    }
+
+
+
+
     public double getxCord(){
         return xCord;
     }
@@ -36,7 +49,7 @@ public class Point {
 
 
 
-
+    // TODO NOT SURE IF USED
     public Circle getCircle(){
 
         return circle;
