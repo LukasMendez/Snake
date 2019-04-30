@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class Snake {
 
     ArrayList<Point> theSnake = new ArrayList<>();
-    Point lastPoint = new Point(340,300);
+    Point lastPoint = new Point(390,300);
     int snakeSize;
 
 
@@ -26,7 +26,14 @@ public class Snake {
         theSnake.add(new Point(320,300));
         theSnake.add(new Point(330,300));
         theSnake.add(new Point(340,300));
-        snakeSize = 5;
+        theSnake.add(new Point(350,300));
+        theSnake.add(new Point(360,300));
+        theSnake.add(new Point(370,300));
+        theSnake.add(new Point(380,300));
+        theSnake.add(new Point(390,300));
+
+
+        snakeSize = 10;
 
     }
 
