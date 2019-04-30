@@ -12,6 +12,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -33,6 +35,7 @@ public class Main extends Application {
     Snake snake = new Snake();
     private GraphicsContext gc;
     private SimpleStringProperty currentDirection = new SimpleStringProperty();
+    private boolean gameOver = false;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -45,42 +48,61 @@ public class Main extends Application {
         currentDirection.set("RIGHT");
 
 
-        drawSnake();
+        gc = canvas.getGraphicsContext2D();
+
+
+        // drawSnake();
 
         new AnimationTimer() {
             long lastUpdate = 0;
 
             public void handle(long now) {
                 if (now - lastUpdate >= 50000000) {
-                    clearCanvas();
-                    drawSnake();
-                    snake.addHead(currentDirection);
-                    snake.removeTail();
-                    lastUpdate = now;
 
-                    // RIGHT BORDER
-                    if (snake.getTail().getxCord()>canvas.getWidth() && currentDirection.get().equals("RIGHT")){
 
-                        System.out.println("Crossed the right border");
-                        snake.setLocation(0,snake.getHead().getyCord());
+                    if (!gameOver) {
 
-                    // LEFT BORDER
-                    } else if (snake.getTail().getxCord()<1 && currentDirection.get().equals("LEFT")){
+                        clearCanvas();
+                        drawSnake();
+                        checkIfEatingItself();
+                        snake.addHead(currentDirection);
+                        snake.removeTail();
+                        lastUpdate = now;
 
-                        System.out.println("I WAS EXECUTED");
-                        snake.setLocation(canvas.getWidth(),snake.getHead().getyCord());
+                        // RIGHT BORDER
+                        if (snake.getTail().getxCord() > canvas.getWidth() && currentDirection.get().equals("RIGHT")) {
 
+                            System.out.println("Crossed the right border");
+                            snake.setLocation(0, snake.getHead().getyCord());
+
+                            // LEFT BORDER
+                        } else if (snake.getTail().getxCord() < 1 && currentDirection.get().equals("LEFT")) {
+
+                            System.out.println("I WAS EXECUTED");
+                            snake.setLocation(canvas.getWidth(), snake.getHead().getyCord());
+                        }
+                        // TOP BORDER
+                        else if (snake.getTail().getyCord() == 0 && currentDirection.get().equals("UP")) {
+
+                            System.out.println("Crossed the UP border");
+                            snake.setLocation(snake.getHead().getxCord(), canvas.getHeight());
+
+                            // BOTTOM BORDER
+                        } else if (snake.getTail().getyCord() == canvas.getHeight() && currentDirection.get().equals("DOWN")) {
+                            System.out.println("Crossed the DOWN border");
+                            snake.setLocation(snake.getHead().getxCord(), 0);
+                        }
+
+
+                    } else {
+
+
+                        drawGameOver();
                     }
-                    // TOP BORDER
-
-
-
-
-                    // BOTTOM BORDER
-
 
 
                 }
+
             }
         }.start();
 
@@ -127,12 +149,19 @@ public class Main extends Application {
                         currentDirection.set("RIGHT");
                         System.out.println("Pressed right");
                         break;
+                    case R:
 
+                        //  clearCanvas();
+                        // snake = new Snake();
+                        gameOver = false;
+                        break;
 
                 }
             }
         });
 
+
+   //     drawGameOver();
 
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -143,7 +172,7 @@ public class Main extends Application {
 
         gc = canvas.getGraphicsContext2D();
 
-        for (int i = 0; i < snake.getPoint().size()-1 ; i++) {
+        for (int i = 0; i < snake.getPoint().size() - 1; i++) {
 
             gc.setFill(Color.RED);
 
@@ -157,6 +186,26 @@ public class Main extends Application {
         canvas.getGraphicsContext2D().fillOval(snake.getHead().getxCord(), snake.getHead().getyCord(), 10, 10);
 
 
+    }
+
+
+    private void checkIfEatingItself() {
+
+        for (int i = 0; i < snake.getPoint().size() - 1; i++) {
+
+            if (snake.getHead().getxCord() == snake.getPoint().get(i).getxCord() && snake.getHead().getxCord() == snake.getPoint().get(i).getyCord()) {
+
+                gameOver = true;
+
+
+            }
+
+        }
+
+    }
+
+    private void checkIfBitingItself() {
+
 
     }
 
@@ -164,6 +213,27 @@ public class Main extends Application {
         gc.clearRect(0, 0, 700, 700);
     }
 
+    private void drawGameOver() {
+
+        gc = canvas.getGraphicsContext2D();
+
+        gc.setFill(Color.BLACK);
+
+        Font gameOverText = new Font("Arial Black", 40);
+
+        gc.setTextAlign(TextAlignment.CENTER);
+        gc.setFont(gameOverText);
+        gc.fillText("GAME OVER", canvas.getWidth() / 2, 100);
+
+        Font restartText = new Font("Arial Black", 16);
+        gc.setFont(restartText);
+        gc.fillText("Press 'R' to restart the game", canvas.getWidth() / 2, 120);
+
+    }
+
 
 }
+
+
+
 

@@ -26,7 +26,14 @@ public class Snake {
         theSnake.add(new Point(320,300));
         theSnake.add(new Point(330,300));
         theSnake.add(new Point(340,300));
-        snakeSize = 5;
+        theSnake.add(new Point(360,300));
+        theSnake.add(new Point(380,300));
+        theSnake.add(new Point(400,300));
+        theSnake.add(new Point(410,300));
+        theSnake.add(new Point(420,300));
+
+
+        snakeSize = 10;
 
     }
 
