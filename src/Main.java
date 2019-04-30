@@ -58,6 +58,21 @@ public class Main extends Application {
             public void handle(long now) {
                 if (now - lastUpdate >= 50000000) {
 
+                    clearCanvas();
+                    drawFood();
+                    drawSnake();
+                    if(snake.getHead().getxCord() == food.getFood().getxCord() && snake.getHead().getyCord() == food.getFood().getyCord()){
+                        snake.addHead(currentDirection);
+                        food.refreshFood();
+                    }
+                    else{
+                        snake.addHead(currentDirection);
+                        snake.removeTail();
+                    }
+
+                    lastUpdate = now;
+
+
 
                     if (!gameOver) {
 
@@ -230,6 +245,11 @@ public class Main extends Application {
         currentDirection.set("RIGHT");
         gameOver = false;
 
+    }
+
+    private void drawFood(){
+        gc = canvas.getGraphicsContext2D();
+        canvas.getGraphicsContext2D().fillOval(food.getFood().getxCord(), food.getFood().getyCord(), 10, 10);
     }
 
     private void clearCanvas() {
