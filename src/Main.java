@@ -33,7 +33,7 @@ public class Main extends Application {
     BorderPane root = new BorderPane();
     Canvas canvas = new Canvas(700, 700);
     Snake snake = new Snake();
-    private GraphicsContext gc;
+    private GraphicsContext gc = canvas.getGraphicsContext2D();
     private SimpleStringProperty currentDirection = new SimpleStringProperty();
     private boolean gameOver = false;
 
@@ -47,8 +47,6 @@ public class Main extends Application {
         // Default direction when you start the game
         currentDirection.set("RIGHT");
 
-
-        gc = canvas.getGraphicsContext2D();
 
 
         // drawSnake();
@@ -72,24 +70,24 @@ public class Main extends Application {
                         // RIGHT BORDER
                         if (snake.getTail().getxCord() > canvas.getWidth() && currentDirection.get().equals("RIGHT")) {
 
-                            System.out.println("Crossed the right border");
+                            System.out.println("Crossed the RIGHT border");
                             snake.setLocation(0, snake.getHead().getyCord());
 
                             // LEFT BORDER
                         } else if (snake.getTail().getxCord() < 1 && currentDirection.get().equals("LEFT")) {
 
-                            System.out.println("I WAS EXECUTED");
+                            System.out.println("Crossed the LEFT border");
                             snake.setLocation(canvas.getWidth(), snake.getHead().getyCord());
                         }
                         // TOP BORDER
                         else if (snake.getTail().getyCord() == 0 && currentDirection.get().equals("UP")) {
 
-                            System.out.println("Crossed the UP border");
+                            System.out.println("Crossed the UPPER border");
                             snake.setLocation(snake.getHead().getxCord(), canvas.getHeight());
 
                             // BOTTOM BORDER
                         } else if (snake.getTail().getyCord() == canvas.getHeight() && currentDirection.get().equals("DOWN")) {
-                            System.out.println("Crossed the DOWN border");
+                            System.out.println("Crossed the BOTTOM border");
                             snake.setLocation(snake.getHead().getxCord(), 0);
                         }
 
@@ -151,10 +149,7 @@ public class Main extends Application {
                         break;
                     case R:
 
-                        //  clearCanvas();
-                        // snake = new Snake();
-                        gameOver = false;
-                        break;
+                        restartGame();
 
                 }
             }
@@ -170,7 +165,6 @@ public class Main extends Application {
 
     private void drawSnake() {
 
-        gc = canvas.getGraphicsContext2D();
 
         for (int i = 0; i < snake.getPoint().size() - 1; i++) {
 
@@ -191,21 +185,35 @@ public class Main extends Application {
 
     private void checkIfEatingItself() {
 
+
         for (int i = 0; i < snake.getPoint().size() - 1; i++) {
 
-            if (snake.getHead().getxCord() == snake.getPoint().get(i).getxCord() && snake.getHead().getxCord() == snake.getPoint().get(i).getyCord()) {
 
-                gameOver = true;
+            if(snake.getHead().getxCord()!=0 && snake.getHead().getxCord()!=canvas.getWidth()&& snake.getHead().getyCord()!=0 && snake.getHead().getyCord()!=canvas.getHeight()){
+
+                if (snake.getHead().getxCord() == snake.getPoint().get(i).getxCord() && snake.getHead().getyCord() == snake.getPoint().get(i).getyCord()) {
+
+                    System.out.println("Snake was biting itself");
+                    gameOver = true;
+
+                }
 
 
             }
+
+
+
 
         }
 
     }
 
-    private void checkIfBitingItself() {
+    private void restartGame(){
 
+        clearCanvas();
+        snake = new Snake();
+        currentDirection.set("RIGHT");
+        gameOver = false;
 
     }
 
