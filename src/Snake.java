@@ -99,9 +99,7 @@ public class Snake {
 
         }
 
-
-            // TODO MAKE IF ELSE STATEMENTS THAT DETERMINE THE DIRECTION OF THE HEAD BASED ON THE CURRENT DIRECTION SELECTED
-
+        snakeSizeProperty.setValue(theSnake.size());
 
 
 
@@ -109,8 +107,8 @@ public class Snake {
 
     public IntegerProperty getSnakeSizeProperty(){
 
-        snakeSizeProperty.setValue(theSnake.size());
         return snakeSizeProperty;
+
     }
 
     public Point getHead(){

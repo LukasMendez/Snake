@@ -65,8 +65,8 @@ public class Main extends Application {
         // Label
         score.setTextFill(Color.WHITE);
         score.setText("Score: " + scoreProperty.get());
-
         score.textProperty().bind(snake.getSnakeSizeProperty().asString());
+
 
         // HBox settings
         hBox.setPrefHeight(30);
