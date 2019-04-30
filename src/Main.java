@@ -1,14 +1,19 @@
 import javafx.animation.*;
 import javafx.application.Application;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
@@ -30,27 +35,49 @@ import static javafx.scene.input.KeyCode.SHIFT;
  */
 public class Main extends Application {
 
-    BorderPane root = new BorderPane();
-    Canvas canvas = new Canvas(700, 700);
-    Snake snake = new Snake();
-    Food food = new Food();
+    private BorderPane root = new BorderPane();
+    private Canvas canvas = new Canvas(700, 700);
+    private HBox hBox = new HBox();
+
+    private IntegerProperty scoreProperty = new SimpleIntegerProperty();
+
+
+    private Label score = new Label();
+
+    private Snake snake = new Snake();
+    private Food food = new Food();
     private GraphicsContext gc = canvas.getGraphicsContext2D();
     private SimpleStringProperty currentDirection = new SimpleStringProperty();
     private boolean gameOver = false;
+
 
     @Override
     public void start(Stage primaryStage) throws Exception {
 
         Scene scene = new Scene(root, 700, 700);
+        root.setStyle("-fx-background-color: BLACK");
 
         root.setCenter(canvas);
+        root.setTop(hBox);
+
+        scoreProperty.setValue(0);
+
+        // Label
+        score.setTextFill(Color.WHITE);
+        score.setText("Score: " + scoreProperty.get());
+
+        score.textProperty().bind(snake.getSnakeSizeProperty().asString());
+
+        // HBox settings
+        hBox.setPrefHeight(30);
+        hBox.setStyle("-fx-background-color: rgba(47,47,47,0.86)");
+        hBox.setAlignment(Pos.CENTER);
+        hBox.getChildren().addAll(score);
+
 
         // Default direction when you start the game
         currentDirection.set("RIGHT");
 
-
-
-        // drawSnake();
 
         new AnimationTimer() {
             long lastUpdate = 0;
@@ -65,11 +92,10 @@ public class Main extends Application {
                         drawFood();
                         drawSnake();
 
-                        if(snake.getHead().getxCord() == food.getFood().getxCord() && snake.getHead().getyCord() == food.getFood().getyCord()){
+                        if (snake.getHead().getxCord() == food.getFood().getxCord() && snake.getHead().getyCord() == food.getFood().getyCord()) {
                             snake.addHead(currentDirection);
                             food.refreshFood();
-                        }
-                        else{
+                        } else {
                             snake.addHead(currentDirection);
                             snake.removeTail();
                         }
@@ -166,7 +192,7 @@ public class Main extends Application {
         });
 
 
-   //     drawGameOver();
+        //     drawGameOver();
 
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -178,16 +204,16 @@ public class Main extends Application {
 
         for (int i = 0; i < snake.getPoint().size() - 1; i++) {
 
-            gc.setFill(Color.RED);
+            gc.setFill(Color.DARKGREEN);
 
-            canvas.getGraphicsContext2D().fillOval(snake.getPoint().get(i).getxCord(), snake.getPoint().get(i).getyCord(), 10, 10);
+            canvas.getGraphicsContext2D().fillRect(snake.getPoint().get(i).getxCord(), snake.getPoint().get(i).getyCord(), 10, 10);
 
         }
 
 
-        gc.setFill(Color.ORANGE);
+        gc.setFill(Color.LIMEGREEN);
 
-        canvas.getGraphicsContext2D().fillOval(snake.getHead().getxCord(), snake.getHead().getyCord(), 10, 10);
+        canvas.getGraphicsContext2D().fillRect(snake.getHead().getxCord(), snake.getHead().getyCord(), 10, 10);
 
 
     }
@@ -199,7 +225,7 @@ public class Main extends Application {
         for (int i = 0; i < snake.getPoint().size() - 1; i++) {
 
 
-            if(snake.getHead().getxCord()!=0 && snake.getHead().getxCord()!=canvas.getWidth()&& snake.getHead().getyCord()!=0 && snake.getHead().getyCord()!=canvas.getHeight()){
+            if (snake.getHead().getxCord() != 0 && snake.getHead().getxCord() != canvas.getWidth() && snake.getHead().getyCord() != 0 && snake.getHead().getyCord() != canvas.getHeight()) {
 
                 if (snake.getHead().getxCord() == snake.getPoint().get(i).getxCord() && snake.getHead().getyCord() == snake.getPoint().get(i).getyCord()) {
 
@@ -212,13 +238,11 @@ public class Main extends Application {
             }
 
 
-
-
         }
 
     }
 
-    private void restartGame(){
+    private void restartGame() {
 
         clearCanvas();
         snake = new Snake();
@@ -231,8 +255,10 @@ public class Main extends Application {
         gc.clearRect(0, 0, 700, 700);
     }
 
-    private void drawFood(){
+    private void drawFood() {
         gc = canvas.getGraphicsContext2D();
+
+        gc.setFill(Color.ORANGE);
         canvas.getGraphicsContext2D().fillOval(food.getFood().getxCord(), food.getFood().getyCord(), 10, 10);
     }
 
@@ -241,7 +267,7 @@ public class Main extends Application {
 
         gc = canvas.getGraphicsContext2D();
 
-        gc.setFill(Color.BLACK);
+        gc.setFill(Color.RED);
 
         Font gameOverText = new Font("Arial Black", 40);
 

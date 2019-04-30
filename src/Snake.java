@@ -1,3 +1,5 @@
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.shape.Circle;
@@ -13,6 +15,7 @@ public class Snake {
     ArrayList<Point> theSnake = new ArrayList<>();
     Point lastPoint = new Point(390,300);
     int snakeSize;
+    SimpleIntegerProperty snakeSizeProperty = new SimpleIntegerProperty();
 
 
     private final StringProperty directionProperty = new SimpleStringProperty();
@@ -102,6 +105,12 @@ public class Snake {
 
 
 
+    }
+
+    public IntegerProperty getSnakeSizeProperty(){
+
+        snakeSizeProperty.setValue(theSnake.size());
+        return snakeSizeProperty;
     }
 
     public Point getHead(){
