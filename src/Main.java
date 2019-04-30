@@ -31,6 +31,7 @@ public class Main extends Application {
     BorderPane root = new BorderPane();
     Canvas canvas = new Canvas(700, 700);
     Snake snake = new Snake();
+    Food food = new Food();
     private GraphicsContext gc;
     private SimpleStringProperty currentDirection = new SimpleStringProperty();
 
@@ -53,9 +54,17 @@ public class Main extends Application {
             public void handle(long now) {
                 if (now - lastUpdate >= 50000000) {
                     clearCanvas();
+                    drawFood();
                     drawSnake();
-                    snake.addHead(currentDirection);
-                    snake.removeTail();
+                    if(snake.getHead().getxCord() == food.getFood().getxCord() && snake.getHead().getyCord() == food.getFood().getyCord()){
+                        snake.addHead(currentDirection);
+                        food.refreshFood();
+                    }
+                    else{
+                        snake.addHead(currentDirection);
+                        snake.removeTail();
+                    }
+
                     lastUpdate = now;
 
                     // RIGHT BORDER
@@ -158,6 +167,11 @@ public class Main extends Application {
 
 
 
+    }
+
+    private void drawFood(){
+        gc = canvas.getGraphicsContext2D();
+        canvas.getGraphicsContext2D().fillOval(food.getFood().getxCord(), food.getFood().getyCord(), 10, 10);
     }
 
     private void clearCanvas() {
