@@ -77,7 +77,21 @@ public class Main extends Application {
                     if (!gameOver) {
 
                         clearCanvas();
+                        drawFood();
                         drawSnake();
+
+                        if(snake.getHead().getxCord() == food.getFood().getxCord() && snake.getHead().getyCord() == food.getFood().getyCord()){
+                            snake.addHead(currentDirection);
+                            food.refreshFood();
+                        }
+                        else{
+                            snake.addHead(currentDirection);
+                            snake.removeTail();
+                        }
+
+
+
+
                         checkIfEatingItself();
                         snake.addHead(currentDirection);
                         snake.removeTail();
@@ -241,6 +255,12 @@ public class Main extends Application {
     private void clearCanvas() {
         gc.clearRect(0, 0, 700, 700);
     }
+
+    private void drawFood(){
+        gc = canvas.getGraphicsContext2D();
+        canvas.getGraphicsContext2D().fillOval(food.getFood().getxCord(), food.getFood().getyCord(), 10, 10);
+    }
+
 
     private void drawGameOver() {
 
