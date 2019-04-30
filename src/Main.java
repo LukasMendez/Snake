@@ -74,12 +74,7 @@ public class Main extends Application {
                             snake.removeTail();
                         }
 
-
-
-
                         checkIfEatingItself();
-                        snake.addHead(currentDirection);
-                        snake.removeTail();
                         lastUpdate = now;
 
                         // RIGHT BORDER
