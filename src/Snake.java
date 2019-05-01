@@ -105,11 +105,19 @@ public class Snake {
 
     }
 
+
     public IntegerProperty getSnakeSizeProperty(){
 
         return snakeSizeProperty;
 
     }
+
+    public Point getNeck(){
+
+        return theSnake.get(theSnake.size()-2);
+
+    }
+
 
     public Point getHead(){
 

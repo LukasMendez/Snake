@@ -3,9 +3,6 @@ import javafx.application.Application;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -15,19 +12,9 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
-import javafx.util.Duration;
-
-import javax.sound.midi.Sequence;
-
-import java.sql.Time;
-
-import static java.awt.Color.RED;
-import static javafx.scene.input.KeyCode.SHIFT;
 
 /**
  * Created by Lukas
@@ -42,12 +29,21 @@ public class Main extends Application {
     private IntegerProperty scoreProperty = new SimpleIntegerProperty();
 
 
+    private Label lengthOfSnakeLabel = new Label("Length of snake: ");
+    private Label lengthOfSnake = new Label();
+
+    private Label scoreLabel = new Label("Score: ");
     private Label score = new Label();
+
 
     private Snake snake = new Snake();
     private Food food = new Food();
     private GraphicsContext gc = canvas.getGraphicsContext2D();
     private SimpleStringProperty currentDirection = new SimpleStringProperty();
+
+    // USED IN CASE THE CURRENT DIRECTION ISN'T ALLOWED
+    private SimpleStringProperty previousDirection = new SimpleStringProperty();
+
     private boolean gameOver = false;
 
 
@@ -60,23 +56,42 @@ public class Main extends Application {
         root.setCenter(canvas);
         root.setTop(hBox);
 
-        scoreProperty.setValue(0);
 
         // Label
+        lengthOfSnake.setTextFill(Color.WHITE);
+        lengthOfSnakeLabel.setTextFill(Color.WHITE);
+
+        lengthOfSnake.textProperty().bind(snake.getSnakeSizeProperty().asString());
+
+        scoreLabel.setTextFill(Color.WHITE);
         score.setTextFill(Color.WHITE);
-        score.setText("Score: " + scoreProperty.get());
-        score.textProperty().bind(snake.getSnakeSizeProperty().asString());
+
+
+        scoreProperty.setValue(0);
+        scoreLabel.setText("   Score: " );
+        score.textProperty().bind(scoreProperty.asString());
+
+
+
+
+
+
 
 
         // HBox settings
         hBox.setPrefHeight(30);
         hBox.setStyle("-fx-background-color: rgba(47,47,47,0.86)");
         hBox.setAlignment(Pos.CENTER);
-        hBox.getChildren().addAll(score);
+        hBox.getChildren().addAll(lengthOfSnakeLabel,lengthOfSnake, scoreLabel,score);
 
 
         // Default direction when you start the game
+        previousDirection.set("RIGHT");
         currentDirection.set("RIGHT");
+
+
+        // Create the event handler
+        scene.setOnKeyPressed(Main.this::handleKeys);
 
 
         new AnimationTimer() {
@@ -93,18 +108,29 @@ public class Main extends Application {
                         drawSnake();
 
                         if (snake.getHead().getxCord() == food.getFood().getxCord() && snake.getHead().getyCord() == food.getFood().getyCord()) {
+                            scoreProperty.setValue(scoreProperty.get()+200);
                             snake.addHead(currentDirection);
                             food.refreshFood();
                         } else {
+
+                            // TODO FIX THIS REALLY!!!!
+                        /*    if (currentDirection.get().equals("UP") && snake.getHead().getxCord()==snake.getNeck().getxCord()){
+                                snake.addHead(previousDirection);
+                                snake.removeTail();
+                            } */
+
+
                             snake.addHead(currentDirection);
                             snake.removeTail();
                         }
 
                         checkIfEatingItself();
+
                         lastUpdate = now;
 
                         // RIGHT BORDER
                         if (snake.getTail().getxCord() > canvas.getWidth() && currentDirection.get().equals("RIGHT")) {
+
 
                             System.out.println("Crossed the RIGHT border");
                             snake.setLocation(0, snake.getHead().getyCord());
@@ -113,6 +139,7 @@ public class Main extends Application {
                         } else if (snake.getTail().getxCord() < 1 && currentDirection.get().equals("LEFT")) {
 
                             System.out.println("Crossed the LEFT border");
+
                             snake.setLocation(canvas.getWidth(), snake.getHead().getyCord());
                         }
                         // TOP BORDER
@@ -141,59 +168,7 @@ public class Main extends Application {
         }.start();
 
 
-        scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent event) {
-                switch (event.getCode()) {
-
-                    case UP:
-
-                        if (currentDirection.get().equals("DOWN")) {
-                            break;
-                        }
-
-                        currentDirection.set("UP");
-                        System.out.println("Pressed up");
-
-                        break;
-                    case DOWN:
-
-                        if (currentDirection.get().equals("UP")) {
-                            break;
-                        }
-
-                        currentDirection.set("DOWN");
-                        System.out.println("Pressed down");
-                        break;
-                    case LEFT:
-
-                        if (currentDirection.get().equals("RIGHT")) {
-                            break;
-                        }
-
-                        currentDirection.set("LEFT");
-                        System.out.println("Pressed left");
-                        break;
-                    case RIGHT:
-
-                        if (currentDirection.get().equals("LEFT")) {
-                            break;
-                        }
-
-                        currentDirection.set("RIGHT");
-                        System.out.println("Pressed right");
-                        break;
-                    case R:
-
-                        restartGame();
-
-                }
-            }
-        });
-
-
-        //     drawGameOver();
-
+        primaryStage.setResizable(false);
         primaryStage.setScene(scene);
         primaryStage.show();
 
@@ -218,6 +193,9 @@ public class Main extends Application {
 
     }
 
+    /**
+     * Will check if the head touches any of the points from its body
+     */
 
     private void checkIfEatingItself() {
 
@@ -248,6 +226,8 @@ public class Main extends Application {
         snake = new Snake();
         currentDirection.set("RIGHT");
         gameOver = false;
+        lengthOfSnake.textProperty().bind(snake.getSnakeSizeProperty().asString());
+        score.textProperty().bind(scoreProperty.asString());
 
     }
 
@@ -282,6 +262,57 @@ public class Main extends Application {
     }
 
 
+    public void handleKeys(KeyEvent event) {
+
+        previousDirection.set(currentDirection.get());
+
+        switch (event.getCode()) {
+
+            case UP:
+
+                if (currentDirection.get().equals("DOWN")) {
+                    break;
+                }
+
+                currentDirection.set("UP");
+                System.out.println("Pressed up");
+
+                break;
+            case DOWN:
+
+                if (currentDirection.get().equals("UP")) {
+                    break;
+                }
+
+                currentDirection.set("DOWN");
+                System.out.println("Pressed down");
+                break;
+            case LEFT:
+
+                if (currentDirection.get().equals("RIGHT")) {
+                    break;
+                }
+
+                currentDirection.set("LEFT");
+                System.out.println("Pressed left");
+                break;
+            case RIGHT:
+
+                if (currentDirection.get().equals("LEFT")) {
+                    break;
+                }
+
+                currentDirection.set("RIGHT");
+                System.out.println("Pressed right");
+                break;
+            case R:
+
+                restartGame();
+
+        }
+
+
+    }
 }
 
 
