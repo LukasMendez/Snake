@@ -50,6 +50,7 @@ public class Main extends Application {
     private int insaneCounter = 0;
 
 
+
     @Override
     public void start(Stage primaryStage) throws Exception {
 
@@ -58,6 +59,7 @@ public class Main extends Application {
 
         root.setCenter(canvas);
         root.setTop(hBox);
+
 
         // Label
         lengthOfSnake.setTextFill(Color.WHITE);
@@ -234,11 +236,19 @@ public class Main extends Application {
         lengthOfSnake.textProperty().bind(snake.getSnakeSizeProperty().asString());
         score.textProperty().bind(scoreProperty.asString());
 
+
     }
+
 
     private void clearCanvas() {
         gc.clearRect(0, 0, 700, 700);
     }
+
+
+    private void clearCanvas() {
+        gc.clearRect(0, 0, 700, 700);
+    }
+
 
     private void drawFood() {
 
@@ -325,6 +335,7 @@ public class Main extends Application {
 
     }
 
+
     public void handleInsaneMode(){
         Canvas overlay = new Canvas(canvas.getWidth(),canvas.getHeight());
         GraphicsContext overlayGc = overlay.getGraphicsContext2D();
@@ -375,6 +386,7 @@ public class Main extends Application {
         }
         System.out.println("insane: " + insaneCounter);
     }
+
 }
 
 
