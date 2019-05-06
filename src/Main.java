@@ -13,7 +13,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 
 /**
@@ -45,6 +47,8 @@ public class Main extends Application {
     private SimpleStringProperty previousDirection = new SimpleStringProperty();
 
     private boolean gameOver = false;
+    private int insaneCounter = 0;
+
 
 
     @Override
@@ -111,6 +115,8 @@ public class Main extends Application {
                             scoreProperty.setValue(scoreProperty.get()+200);
                             snake.addHead(currentDirection);
                             food.refreshFood();
+                            handleInsaneMode();
+
                         } else {
 
                             /*
@@ -230,11 +236,19 @@ public class Main extends Application {
         lengthOfSnake.textProperty().bind(snake.getSnakeSizeProperty().asString());
         score.textProperty().bind(scoreProperty.asString());
 
+
     }
+
 
     private void clearCanvas() {
         gc.clearRect(0, 0, 700, 700);
     }
+
+
+    private void clearCanvas() {
+        gc.clearRect(0, 0, 700, 700);
+    }
+
 
     private void drawFood() {
 
@@ -320,6 +334,59 @@ public class Main extends Application {
 
 
     }
+
+
+    public void handleInsaneMode(){
+        Canvas overlay = new Canvas(canvas.getWidth(),canvas.getHeight());
+        GraphicsContext overlayGc = overlay.getGraphicsContext2D();
+        root.getChildren().add(overlay);
+        Font insaneFont = new Font("Arial Black", 50);
+        Font insaneBigFont = new Font("Arial Black", 60);
+        Color[] colorArray = {Color.RED, Color.LIMEGREEN, Color.ALICEBLUE, Color.ANTIQUEWHITE};
+        if(insaneCounter < 5){
+            insaneCounter += 1;
+        }
+        else if(insaneCounter == 5){
+            Rotate rotate = new Rotate(90);
+            rotate.setPivotX(350);
+            rotate.setPivotY(350);
+            canvas.getTransforms().add(rotate);
+            new AnimationTimer(){
+                int lastUpdate = 0;
+                @Override
+                public void handle(long now) {
+                    if(now - lastUpdate >= 50000000 && insaneCounter == 6){
+                        int random = (int)(Math.random() * 4);
+                        overlayGc.setFill(colorArray[random]);
+                        overlayGc.setTextAlign(TextAlignment.CENTER);
+                        random = (int)(Math.random() * 10);
+                        if(random > 8){
+                            overlayGc.setFont(insaneBigFont);
+                        }else{
+                            overlayGc.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
+                            overlayGc.setFont(insaneFont);
+                        }
+                        overlayGc.fillText("INSANE MODE!", canvas.getWidth() / 2, canvas.getHeight() / 2);
+                    }
+                    else{
+                        overlayGc.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
+                        stop();
+                    }
+                }
+            }.start();
+            insaneCounter += 1;
+        }
+        else if(insaneCounter == 6){
+            Rotate rotate = new Rotate(-90);
+            rotate.setPivotX(350);
+            rotate.setPivotY(350);
+            canvas.getTransforms().add(rotate);
+            //insaneText.setFill(Color.color(0,0,0,0));
+            insaneCounter = 0;
+        }
+        System.out.println("insane: " + insaneCounter);
+    }
+
 }
 
 
