@@ -4,18 +4,21 @@
  */
 public class Food {
 
+    private String type;
+    private Point food;
+
+
     public Point getFood() {
         return food;
     }
 
-    private Point food;
 
     public Food(){
-        this.food = RandomCoord();
+        this.food = randomCoord();
     }
 
     //
-    public Point RandomCoord(){
+    public Point randomCoord(){
         int xCord = (int)(Math.random() * 650);
         int yCord = (int)(Math.random() * 650);
         int temp = xCord % 10;
@@ -26,8 +29,26 @@ public class Food {
         return point;
     }
 
+
+    public String randomFood(){
+
+        int randomNumber = ((int)(Math.random() * 100));
+
+        if (randomNumber>=0 && randomNumber<40){
+
+            type = "normal";
+
+        }
+
+
+
+    }
+
+
+
     public void refreshFood(){
-        food = RandomCoord();
+        food = randomCoord();
+        type = "TODO";
     }
 
 

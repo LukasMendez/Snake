@@ -113,8 +113,9 @@ public class Main extends Application {
                             food.refreshFood();
                         } else {
 
+                            /*
                             // TODO FIX THIS REALLY!!!!
-                        /*    if (currentDirection.get().equals("UP") && snake.getHead().getxCord()==snake.getNeck().getxCord()){
+                            if (previousDirection.get().equals("LEFT") && snake.getHead().getxCord()==snake.getNeck().getxCord()){
                                 snake.addHead(previousDirection);
                                 snake.removeTail();
                             } */
@@ -236,6 +237,12 @@ public class Main extends Application {
     }
 
     private void drawFood() {
+
+        double xCord = food.getFood().getxCord();
+        double yCord = food.getFood().getyCord();
+        String type = "default";
+
+
         gc = canvas.getGraphicsContext2D();
 
         gc.setFill(Color.ORANGE);
