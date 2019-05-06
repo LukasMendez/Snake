@@ -30,7 +30,7 @@ public class Food {
     }
 
 
-
+/*
     public String randomFood(){
 
         int randomNumber = ((int)(Math.random() * 100));
@@ -43,7 +43,7 @@ public class Food {
 
 
 
-    }
+    }*/
 
 
 

@@ -245,11 +245,6 @@ public class Main extends Application {
     }
 
 
-    private void clearCanvas() {
-        gc.clearRect(0, 0, 700, 700);
-    }
-
-
     private void drawFood() {
 
         double xCord = food.getFood().getxCord();
