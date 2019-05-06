@@ -30,20 +30,6 @@ public class Food {
     }
 
 
-    public String randomFood(){
-
-        int randomNumber = ((int)(Math.random() * 100));
-
-        if (randomNumber>=0 && randomNumber<40){
-
-            type = "normal";
-
-        }
-
-
-
-    }
-
 
 
     public void refreshFood(){
