@@ -4,12 +4,16 @@
  */
 public class Food {
 
-    private String type;
+    private String type = "normal";
     private Point food;
 
 
     public Point getFood() {
         return food;
+    }
+
+    public String getType(){
+        return type;
     }
 
 
@@ -30,16 +34,23 @@ public class Food {
     }
 
 
-    public String randomFood(){
+    public void randomFood(){
 
         int randomNumber = ((int)(Math.random() * 100));
 
-        if (randomNumber>=0 && randomNumber<40){
+        if (randomNumber>=0 && randomNumber<=40){
 
             type = "normal";
 
-        }
+        } else if (randomNumber>40 && randomNumber<=70){
 
+            type = "speed";
+
+        } else if (randomNumber>70 && randomNumber<=100){
+
+            type = "double head";
+
+        }
 
 
     }
@@ -48,7 +59,7 @@ public class Food {
 
     public void refreshFood(){
         food = randomCoord();
-        type = "TODO";
+        randomFood();
     }
 
 

@@ -41,6 +41,8 @@ public class Main extends Application {
     private GraphicsContext gc = canvas.getGraphicsContext2D();
     private SimpleStringProperty currentDirection = new SimpleStringProperty();
 
+    private int speedInMiliSecs = 50000000;
+
     // USED IN CASE THE CURRENT DIRECTION ISN'T ALLOWED
     private SimpleStringProperty previousDirection = new SimpleStringProperty();
 
@@ -98,7 +100,7 @@ public class Main extends Application {
             long lastUpdate = 0;
 
             public void handle(long now) {
-                if (now - lastUpdate >= 50000000) {
+                if (now - lastUpdate >= speedInMiliSecs) {
 
 
                     if (!gameOver) {
@@ -110,7 +112,17 @@ public class Main extends Application {
                         if (snake.getHead().getxCord() == food.getFood().getxCord() && snake.getHead().getyCord() == food.getFood().getyCord()) {
                             scoreProperty.setValue(scoreProperty.get()+200);
                             snake.addHead(currentDirection);
+
+                            speedInMiliSecs = 50000000;
+
+                            if (food.getType().equals("speed")){
+
+                                // Will increase the speed
+                                speedInMiliSecs = 300000;
+                            }
+
                             food.refreshFood();
+
                         } else {
 
                             /*
@@ -240,13 +252,34 @@ public class Main extends Application {
 
         double xCord = food.getFood().getxCord();
         double yCord = food.getFood().getyCord();
-        String type = "default";
+        String type = food.getType();
+
+        if (type.equals("normal")){
+
+            gc = canvas.getGraphicsContext2D();
+
+            gc.setFill(Color.ORANGE);
+            canvas.getGraphicsContext2D().fillOval(food.getFood().getxCord(), food.getFood().getyCord(), 10, 10);
 
 
-        gc = canvas.getGraphicsContext2D();
+        } else if (type.equals("speed")){
 
-        gc.setFill(Color.ORANGE);
-        canvas.getGraphicsContext2D().fillOval(food.getFood().getxCord(), food.getFood().getyCord(), 10, 10);
+            gc = canvas.getGraphicsContext2D();
+
+            gc.setFill(Color.BLUE);
+            canvas.getGraphicsContext2D().fillOval(food.getFood().getxCord(), food.getFood().getyCord(), 10, 10);
+
+        } else if (type.equals("double head")){
+
+            gc = canvas.getGraphicsContext2D();
+
+            gc.setFill(Color.PURPLE);
+            canvas.getGraphicsContext2D().fillOval(food.getFood().getxCord(), food.getFood().getyCord(), 10, 10);
+
+        }
+
+
+
     }
 
 
