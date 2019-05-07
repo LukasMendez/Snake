@@ -57,6 +57,7 @@ public class Food {
 
 
 
+
     public void refreshFood(){
         food = randomCoord();
         randomFood();
