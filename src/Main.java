@@ -44,6 +44,8 @@ public class Main extends Application {
     private SimpleStringProperty currentDirection = new SimpleStringProperty();
 
     private int speedInMiliSecs = 50000000;
+    int foodTolerance = 0;
+
 
     // USED IN CASE THE CURRENT DIRECTION ISN'T ALLOWED
     private SimpleStringProperty previousDirection = new SimpleStringProperty();
@@ -113,16 +115,24 @@ public class Main extends Application {
                         drawFood();
                         drawSnake();
 
-                        if (snake.getHead().getxCord() == food.getFood().getxCord() && snake.getHead().getyCord() == food.getFood().getyCord()) {
+                        if (snake.getHead().getxCord() <= (food.getFood().getxCord() + foodTolerance) &&
+                                snake.getHead().getxCord() >= (food.getFood().getxCord() - foodTolerance) &&
+                                snake.getHead().getyCord() <= (food.getFood().getyCord() + foodTolerance) &&
+                                snake.getHead().getyCord() >= (food.getFood().getyCord() - foodTolerance)) {
                             scoreProperty.setValue(scoreProperty.get()+200);
                             snake.addHead(currentDirection);
 
                             speedInMiliSecs = 50000000;
+                            foodTolerance = 0;
+
 
                             if (food.getType().equals("speed")){
 
                                 // Will increase the speed
                                 speedInMiliSecs = 300000;
+                            }
+                            else if(food.getType().equals("double head")){
+                                foodTolerance = 10;
                             }
 
                             food.refreshFood();
@@ -204,12 +214,13 @@ public class Main extends Application {
 
         }
 
-
         gc.setFill(Color.LIMEGREEN);
 
-        canvas.getGraphicsContext2D().fillRect(snake.getHead().getxCord(), snake.getHead().getyCord(), 10, 10);
-
-
+        canvas.getGraphicsContext2D().fillRect(
+                snake.getHead().getxCord() - foodTolerance,
+                snake.getHead().getyCord() - foodTolerance,
+                10 + (foodTolerance * 2),
+                10 + (foodTolerance * 2));
     }
 
     /**
@@ -375,15 +386,12 @@ public class Main extends Application {
             insaneCounter += 1;
         }
         else if(insaneCounter == 5){
-            Rotate rotate = new Rotate(90);
-            rotate.setPivotX(350);
-            rotate.setPivotY(350);
-            canvas.getTransforms().add(rotate);
+            insaneRotation(90);
             new AnimationTimer(){
                 int lastUpdate = 0;
                 @Override
                 public void handle(long now) {
-                    if(now - lastUpdate >= 50000000 && insaneCounter == 6){
+                    if(now - lastUpdate >= 50000000 && insaneCounter == 6 && !gameOver){
                         int random = (int)(Math.random() * 4);
                         overlayGc.setFill(colorArray[random]);
                         overlayGc.setTextAlign(TextAlignment.CENTER);
@@ -398,6 +406,7 @@ public class Main extends Application {
                     }
                     else{
                         overlayGc.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
+                        insaneRotation(-90);
                         stop();
                     }
                 }
@@ -405,16 +414,17 @@ public class Main extends Application {
             insaneCounter += 1;
         }
         else if(insaneCounter == 6){
-            Rotate rotate = new Rotate(-90);
-            rotate.setPivotX(350);
-            rotate.setPivotY(350);
-            canvas.getTransforms().add(rotate);
-            //insaneText.setFill(Color.color(0,0,0,0));
             insaneCounter = 0;
         }
         System.out.println("insane: " + insaneCounter);
     }
 
+    public void insaneRotation(int angle){
+        Rotate rotate = new Rotate(angle);
+        rotate.setPivotX(350);
+        rotate.setPivotY(350);
+        canvas.getTransforms().add(rotate);
+    }
 }
 
 
