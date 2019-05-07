@@ -49,15 +49,5 @@ public class Point {
 
 
 
-    // TODO NOT SURE IF USED
-    public Circle getCircle(){
-
-        return circle;
-    }
-
-
-
-
-
 
 }

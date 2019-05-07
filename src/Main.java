@@ -1,3 +1,4 @@
+
 import javafx.animation.*;
 import javafx.application.Application;
 import javafx.beans.property.IntegerProperty;
@@ -11,9 +12,10 @@ import javafx.scene.control.Label;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
@@ -53,6 +55,8 @@ public class Main extends Application {
     private boolean gameOver = false;
     private int insaneCounter = 0;
 
+    // Background music
+    MediaPlayer musicplayer;
 
 
     @Override
@@ -63,6 +67,7 @@ public class Main extends Application {
 
         root.setCenter(canvas);
         root.setTop(hBox);
+
 
 
         // Label
@@ -76,7 +81,7 @@ public class Main extends Application {
 
 
         scoreProperty.setValue(0);
-        scoreLabel.setText("   Score: " );
+        scoreLabel.setText("   Score: ");
         score.textProperty().bind(scoreProperty.asString());
 
 
@@ -88,24 +93,20 @@ public class Main extends Application {
         food.refreshFoodTimer();
 
 
-
-
-
-
-
-
-
         // HBox settings
         hBox.setPrefHeight(30);
         hBox.setStyle("-fx-background-color: rgba(47,47,47,0.86)");
         hBox.setAlignment(Pos.CENTER);
-        hBox.getChildren().addAll(lengthOfSnakeLabel,lengthOfSnake, scoreLabel,score);
+        hBox.getChildren().addAll(lengthOfSnakeLabel, lengthOfSnake, scoreLabel, score);
 
 
         // Default direction when you start the game
         previousDirection.set("RIGHT");
         currentDirection.set("RIGHT");
 
+
+        // Background music
+        playBackgroundMelody("Media/backgroundmusic.mp3");
 
         // Create the event handler
         scene.setOnKeyPressed(Main.this::handleKeys);
@@ -128,19 +129,25 @@ public class Main extends Application {
                                 snake.getHead().getxCord() >= (food.getFood().getxCord() - foodTolerance) &&
                                 snake.getHead().getyCord() <= (food.getFood().getyCord() + foodTolerance) &&
                                 snake.getHead().getyCord() >= (food.getFood().getyCord() - foodTolerance)) {
-                            scoreProperty.setValue(scoreProperty.get()+200);
+                            scoreProperty.setValue(scoreProperty.get() + 200);
                             snake.addHead(currentDirection);
+
+                            eatSound();
 
                             speedInMiliSecs = 50000000;
                             foodTolerance = 0;
 
 
-                            if (food.getType().equals("speed")){
+                            if (food.getType().equals("speed")) {
+
+                                eatSound();
 
                                 // Will increase the speed
                                 speedInMiliSecs = 300000;
-                            }
-                            else if(food.getType().equals("double head")){
+                            } else if (food.getType().equals("double head")) {
+
+                                eatSound();
+
                                 foodTolerance = 10;
                             }
 
@@ -149,14 +156,6 @@ public class Main extends Application {
                             handleInsaneMode();
 
                         } else {
-
-                            /*
-                            // TODO FIX THIS REALLY!!!!
-                            if (previousDirection.get().equals("LEFT") && snake.getHead().getxCord()==snake.getNeck().getxCord()){
-                                snake.addHead(previousDirection);
-                                snake.removeTail();
-                            } */
-
 
                             snake.addHead(currentDirection);
                             snake.removeTail();
@@ -264,53 +263,18 @@ public class Main extends Application {
         clearCanvas();
         snake = new Snake();
         currentDirection.set("RIGHT");
+        speedInMiliSecs = 50000000;
+        foodTolerance = 0;
+        insaneCounter=0;
         gameOver = false;
         lengthOfSnake.textProperty().bind(snake.getSnakeSizeProperty().asString());
+        scoreProperty.set(0);
         score.textProperty().bind(scoreProperty.asString());
+        playBackgroundMelody("Media/backgroundmusic.mp3");
+        soundPlayAble=1;
 
 
     }
-
-
-    private void clearCanvas() {
-        gc.clearRect(0, 0, 700, 700);
-    }
-
-
-    private void drawFood() {
-
-        double xCord = food.getFood().getxCord();
-        double yCord = food.getFood().getyCord();
-        String type = food.getType();
-
-        if (type.equals("normal")){
-
-            gc = canvas.getGraphicsContext2D();
-
-            gc.setFill(Color.ORANGE);
-            canvas.getGraphicsContext2D().fillOval(food.getFood().getxCord(), food.getFood().getyCord(), 10, 10);
-
-
-        } else if (type.equals("speed")){
-
-            gc = canvas.getGraphicsContext2D();
-
-            gc.setFill(Color.BLUE);
-            canvas.getGraphicsContext2D().fillOval(food.getFood().getxCord(), food.getFood().getyCord(), 10, 10);
-
-        } else if (type.equals("double head")){
-
-            gc = canvas.getGraphicsContext2D();
-
-            gc.setFill(Color.PURPLE);
-            canvas.getGraphicsContext2D().fillOval(food.getFood().getxCord(), food.getFood().getyCord(), 10, 10);
-
-        }
-
-
-
-    }
-
 
     private void drawGameOver() {
 
@@ -328,7 +292,48 @@ public class Main extends Application {
         gc.setFont(restartText);
         gc.fillText("Press 'R' to restart the game", canvas.getWidth() / 2, 120);
 
+        playGameOverSound();
+
+
     }
+
+
+    private void clearCanvas() {
+        gc.clearRect(0, 0, 700, 700);
+    }
+
+
+    private void drawFood() {
+
+        String type = food.getType();
+
+        if (type.equals("normal")) {
+
+            gc = canvas.getGraphicsContext2D();
+
+            gc.setFill(Color.ORANGE);
+            canvas.getGraphicsContext2D().fillOval(food.getFood().getxCord(), food.getFood().getyCord(), 10, 10);
+
+
+        } else if (type.equals("speed")) {
+
+            gc = canvas.getGraphicsContext2D();
+
+            gc.setFill(Color.BLUE);
+            canvas.getGraphicsContext2D().fillOval(food.getFood().getxCord(), food.getFood().getyCord(), 10, 10);
+
+        } else if (type.equals("double head")) {
+
+            gc = canvas.getGraphicsContext2D();
+
+            gc.setFill(Color.PURPLE);
+            canvas.getGraphicsContext2D().fillOval(food.getFood().getxCord(), food.getFood().getyCord(), 10, 10);
+
+        }
+
+
+    }
+
 
 
     public void handleKeys(KeyEvent event) {
@@ -343,8 +348,11 @@ public class Main extends Application {
                     break;
                 }
 
-                currentDirection.set("UP");
-                System.out.println("Pressed up");
+                if (snake.getHead().getxCord()!=snake.getNeck().getxCord()){
+                    currentDirection.set("UP");
+                    System.out.println("Pressed up");
+
+                }
 
                 break;
             case DOWN:
@@ -353,8 +361,14 @@ public class Main extends Application {
                     break;
                 }
 
-                currentDirection.set("DOWN");
-                System.out.println("Pressed down");
+
+                if (snake.getHead().getxCord()!=snake.getNeck().getxCord()){
+                    currentDirection.set("DOWN");
+                    System.out.println("Pressed down");
+
+                }
+
+
                 break;
             case LEFT:
 
@@ -362,8 +376,13 @@ public class Main extends Application {
                     break;
                 }
 
-                currentDirection.set("LEFT");
-                System.out.println("Pressed left");
+                if (snake.getHead().getyCord()!=snake.getNeck().getyCord()){
+
+                    currentDirection.set("LEFT");
+                    System.out.println("Pressed left");
+                }
+
+
                 break;
             case RIGHT:
 
@@ -371,9 +390,16 @@ public class Main extends Application {
                     break;
                 }
 
-                currentDirection.set("RIGHT");
-                System.out.println("Pressed right");
+
+                if (snake.getHead().getyCord()!=snake.getNeck().getyCord()){
+
+                    currentDirection.set("RIGHT");
+                    System.out.println("Pressed right");
+
+                }
+
                 break;
+
             case R:
 
                 restartGame();
@@ -384,58 +410,126 @@ public class Main extends Application {
     }
 
 
-    public void handleInsaneMode(){
-        Canvas overlay = new Canvas(canvas.getWidth(),canvas.getHeight());
+    public void handleInsaneMode() {
+        Canvas overlay = new Canvas(canvas.getWidth(), canvas.getHeight());
         GraphicsContext overlayGc = overlay.getGraphicsContext2D();
         root.getChildren().add(overlay);
         Font insaneFont = new Font("Arial Black", 50);
         Font insaneBigFont = new Font("Arial Black", 60);
         Color[] colorArray = {Color.RED, Color.LIMEGREEN, Color.ALICEBLUE, Color.ANTIQUEWHITE};
-        if(insaneCounter < 5){
+        if (insaneCounter < 5) {
             insaneCounter += 1;
-        }
-        else if(insaneCounter == 5){
+        } else if (insaneCounter == 5) {
+
+            musicplayer.stop();
+            playBackgroundMelody("Media/mario.mp3");
+
+            root.setStyle("-fx-background-color: #2e0044");
             insaneRotation(90);
-            new AnimationTimer(){
+            new AnimationTimer() {
                 int lastUpdate = 0;
+
                 @Override
                 public void handle(long now) {
-                    if(now - lastUpdate >= 50000000 && insaneCounter == 6 && !gameOver){
-                        int random = (int)(Math.random() * 4);
+                    if (now - lastUpdate >= 50000000 && insaneCounter == 6 && !gameOver) {
+                        int random = (int) (Math.random() * 4);
                         overlayGc.setFill(colorArray[random]);
                         overlayGc.setTextAlign(TextAlignment.CENTER);
-                        random = (int)(Math.random() * 10);
-                        if(random > 8){
+                        random = (int) (Math.random() * 10);
+                        if (random > 8) {
                             overlayGc.setFont(insaneBigFont);
-                        }else{
-                            overlayGc.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
+                        } else {
+                            overlayGc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
                             overlayGc.setFont(insaneFont);
                         }
                         overlayGc.fillText("INSANE MODE!", canvas.getWidth() / 2, canvas.getHeight() / 2);
-                    }
-                    else{
-                        overlayGc.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
+                    } else {
+                        overlayGc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
                         insaneRotation(-90);
+
+                        musicplayer.stop();
+                        playBackgroundMelody("Media/backgroundmusic.mp3");
+                        root.setStyle("-fx-background-color: BLACK");
                         stop();
                     }
                 }
             }.start();
             insaneCounter += 1;
-        }
-        else if(insaneCounter == 6){
+        } else if (insaneCounter == 6) {
             insaneCounter = 0;
         }
         System.out.println("insane: " + insaneCounter);
     }
 
-    public void insaneRotation(int angle){
+    public void insaneRotation(int angle) {
         Rotate rotate = new Rotate(angle);
         rotate.setPivotX(350);
         rotate.setPivotY(350);
         canvas.getTransforms().add(rotate);
     }
+
+
+    // SOUND EFFECTS
+
+
+    public void playBackgroundMelody(String path){
+
+        if (musicplayer!=null){
+
+            musicplayer.stop();
+        }
+
+        Media mp3MusicFile = new Media(getClass().getResource(path).toExternalForm());
+
+        musicplayer = new MediaPlayer(mp3MusicFile);
+        musicplayer.setAutoPlay(true);
+        musicplayer.setCycleCount(MediaPlayer.INDEFINITE);
+
+
+    }
+
+    // USED TO PREVENT THE ANIMATION TIMER FROM RESTARTING THE SONG OVER AND OVER
+    private int soundPlayAble = 1;
+
+    private void playGameOverSound(){
+
+
+
+        if (soundPlayAble==1){
+
+            playBackgroundMelody("Media/gameover.mp3");
+            musicplayer.setCycleCount(1);
+            soundPlayAble=0;
+        }
+
+
+    }
+
+
+
+    private void eatSound(){
+
+        Media soundEffect = new Media(getClass().getResource("Media/eatingSound.mp3").toExternalForm());
+
+        MediaPlayer mediaPlayerShort = new MediaPlayer(soundEffect);
+        mediaPlayerShort.setAutoPlay(true);
+        mediaPlayerShort.setCycleCount(1);
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 }
-
-
 
 

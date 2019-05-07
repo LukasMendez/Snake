@@ -65,7 +65,6 @@ public class Food {
     public void refreshFood(){
         food = randomCoord();
 
-        type = "TODO";
         // Cancel active timer (Else their would be different timers and the food would jump)
         timer.cancel();
         // Creates a new timer after the timer got cancelled. Else their would be an exception error
