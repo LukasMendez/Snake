@@ -375,10 +375,7 @@ public class Main extends Application {
             insaneCounter += 1;
         }
         else if(insaneCounter == 5){
-            Rotate rotate = new Rotate(90);
-            rotate.setPivotX(350);
-            rotate.setPivotY(350);
-            canvas.getTransforms().add(rotate);
+            insaneRotation(90);
             new AnimationTimer(){
                 int lastUpdate = 0;
                 @Override
@@ -398,7 +395,7 @@ public class Main extends Application {
                     }
                     else{
                         overlayGc.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
-                        cancelInsaneRotation();
+                        insaneRotation(-90);
                         stop();
                     }
                 }
@@ -406,14 +403,13 @@ public class Main extends Application {
             insaneCounter += 1;
         }
         else if(insaneCounter == 6){
-            cancelInsaneRotation();
             insaneCounter = 0;
         }
         System.out.println("insane: " + insaneCounter);
     }
 
-    public void cancelInsaneRotation(){
-        Rotate rotate = new Rotate(-90);
+    public void insaneRotation(int angle){
+        Rotate rotate = new Rotate(angle);
         rotate.setPivotX(350);
         rotate.setPivotY(350);
         canvas.getTransforms().add(rotate);
