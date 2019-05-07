@@ -214,7 +214,6 @@ public class Main extends Application {
 
         }
 
-
         gc.setFill(Color.LIMEGREEN);
 
         canvas.getGraphicsContext2D().fillRect(
@@ -222,8 +221,6 @@ public class Main extends Application {
                 snake.getHead().getyCord() - foodTolerance,
                 10 + (foodTolerance * 2),
                 10 + (foodTolerance * 2));
-
-
     }
 
     /**
