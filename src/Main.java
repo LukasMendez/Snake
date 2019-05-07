@@ -76,6 +76,15 @@ public class Main extends Application {
         score.textProperty().bind(scoreProperty.asString());
 
 
+        // This calls the timer method found in the food class
+        // This will be called a single time to start the timer process/thread
+        // If you dont want the timer to run by default / startup, you can out comment this one here.
+        // Then the timer will first get initialized after the player ate his first fruit...
+        System.out.println("Timer initialized...");
+        food.refreshFoodTimer();
+
+
+
 
 
 
