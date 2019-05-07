@@ -383,7 +383,7 @@ public class Main extends Application {
                 int lastUpdate = 0;
                 @Override
                 public void handle(long now) {
-                    if(now - lastUpdate >= 50000000 && insaneCounter == 6){
+                    if(now - lastUpdate >= 50000000 && insaneCounter == 6 && !gameOver){
                         int random = (int)(Math.random() * 4);
                         overlayGc.setFill(colorArray[random]);
                         overlayGc.setTextAlign(TextAlignment.CENTER);
@@ -398,6 +398,7 @@ public class Main extends Application {
                     }
                     else{
                         overlayGc.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
+                        cancelInsaneRotation();
                         stop();
                     }
                 }
@@ -405,16 +406,18 @@ public class Main extends Application {
             insaneCounter += 1;
         }
         else if(insaneCounter == 6){
-            Rotate rotate = new Rotate(-90);
-            rotate.setPivotX(350);
-            rotate.setPivotY(350);
-            canvas.getTransforms().add(rotate);
-            //insaneText.setFill(Color.color(0,0,0,0));
+            cancelInsaneRotation();
             insaneCounter = 0;
         }
         System.out.println("insane: " + insaneCounter);
     }
 
+    public void cancelInsaneRotation(){
+        Rotate rotate = new Rotate(-90);
+        rotate.setPivotX(350);
+        rotate.setPivotY(350);
+        canvas.getTransforms().add(rotate);
+    }
 }
 
 
