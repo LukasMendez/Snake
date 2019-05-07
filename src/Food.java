@@ -1,3 +1,6 @@
+import java.util.Timer;
+import java.util.TimerTask;
+
 /**
  * Created by Lukas
  * 29-04-2019.
@@ -6,6 +9,7 @@ public class Food {
 
     private String type = "normal";
     private Point food;
+    Timer timer = new Timer();
 
 
     public Point getFood() {
@@ -60,8 +64,40 @@ public class Food {
 
     public void refreshFood(){
         food = randomCoord();
+
+        type = "TODO";
+        // Cancel active timer (Else their would be different timers and the food would jump)
+        timer.cancel();
+        // Creates a new timer after the timer got cancelled. Else their would be an exception error
+        timer = new Timer();
+        // Calls the food timer, to repeat the timer, after it has been cancelled.
+        refreshFoodTimer();
+
+
+
         randomFood();
+
     }
+
+    public void refreshFoodTimer(){
+
+        //TODO Maybe implement a try catch ? It's not necessary with that what I have done, but if the timer failes to initialize one single time, it will throw an error
+        //TODO and the timer wont get initialized afterwords.
+
+        System.out.println("refreshFoodTimer Called");
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                // Calls method to refresh food
+                refreshFood();
+                // purges the timer cache to clean up stuff (saves memory)
+                timer.purge();
+                System.out.println("New food has been served! Bon appetit :)");
+            }
+        }, 8*1000);
+    }
+
+
 
 
 }
