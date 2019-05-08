@@ -1,12 +1,9 @@
 
 import javafx.animation.*;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -22,7 +19,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 /**
  * Created by Lukas
@@ -73,7 +69,6 @@ public class Main extends Application {
         root.setTop(hBox);
 
 
-
         // Label
         lengthOfSnake.setTextFill(Color.WHITE);
         lengthOfSnakeLabel.setTextFill(Color.WHITE);
@@ -122,99 +117,31 @@ public class Main extends Application {
             public void handle(long now) {
                 if (now - lastUpdate >= speedInMiliSecs) {
 
-
                     if (!gameOver) {
 
                         clearCanvas();
                         drawFood();
                         drawSnake();
 
-                        if (snake.getHead().getxCord() <= (food.getFood().getxCord() + foodTolerance) &&
-                                snake.getHead().getxCord() >= (food.getFood().getxCord() - foodTolerance) &&
-                                snake.getHead().getyCord() <= (food.getFood().getyCord() + foodTolerance) &&
-                                snake.getHead().getyCord() >= (food.getFood().getyCord() - foodTolerance)) {
-                            scoreProperty.setValue(scoreProperty.get() + 200);
-                            snake.addHead(currentDirection);
-
-                            eatSound();
-
-                            speedInMiliSecs = 50000000;
-                            foodTolerance = 0;
-
-
-                            if (food.getType().equals("speed")) {
-
-                                eatSound();
-
-                                // Will increase the speed
-                                speedInMiliSecs = 300000;
-                            } else if (food.getType().equals("double head")) {
-
-                                eatSound();
-
-                                foodTolerance = 10;
-                            }
-
-                            food.refreshFood();
-
-                            handleInsaneMode();
-
-                        } else {
-
-                            snake.addHead(currentDirection);
-                            snake.removeTail();
-                        }
-
+                        checkIfEatingFood();
                         checkIfEatingItself();
 
                         lastUpdate = now;
-
-                        // RIGHT BORDER
-                        if (snake.getTail().getxCord() > canvas.getWidth() && currentDirection.get().equals("RIGHT")) {
-
-
-                            System.out.println("Crossed the RIGHT border");
-                            snake.setLocation(0, snake.getHead().getyCord());
-
-                            // LEFT BORDER
-                        } else if (snake.getTail().getxCord() < 1 && currentDirection.get().equals("LEFT")) {
-
-                            System.out.println("Crossed the LEFT border");
-
-                            snake.setLocation(canvas.getWidth(), snake.getHead().getyCord());
-                        }
-                        // TOP BORDER
-                        else if (snake.getTail().getyCord() == 0 && currentDirection.get().equals("UP")) {
-
-                            System.out.println("Crossed the UPPER border");
-                            snake.setLocation(snake.getHead().getxCord(), canvas.getHeight());
-
-                            // BOTTOM BORDER
-                        } else if (snake.getTail().getyCord() == canvas.getHeight() && currentDirection.get().equals("DOWN")) {
-                            System.out.println("Crossed the BOTTOM border");
-                            snake.setLocation(snake.getHead().getxCord(), 0);
-                        }
-
+                        checkBorders();
 
                     } else {
 
-
                         drawGameOver();
                     }
-
-
                 }
-
             }
         }.start();
 
 
         // WILL MAKE SURE TO KILL ALL THREADS WHEN CLOSING THE WINDOW
-        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            public void handle(WindowEvent we) {
-                System.out.println("Stage is closing");
-                System.exit(0);
-            }
+        primaryStage.setOnCloseRequest(we -> {
+            System.out.println("Stage is closing");
+            System.exit(0);
         });
 
 
@@ -224,6 +151,103 @@ public class Main extends Application {
 
     }
 
+    /**
+     * This method will basically check if the head from the snake is touching the food, but also activate the effect of the specified food type.
+     */
+    private void checkIfEatingFood() {
+        if (snake.getHead().getxCord() <= (food.getFood().getxCord() + foodTolerance) &&
+                snake.getHead().getxCord() >= (food.getFood().getxCord() - foodTolerance) &&
+                snake.getHead().getyCord() <= (food.getFood().getyCord() + foodTolerance) &&
+                snake.getHead().getyCord() >= (food.getFood().getyCord() - foodTolerance)) {
+            scoreProperty.setValue(scoreProperty.get() + 200);
+            snake.addHead(currentDirection);
+
+            eatSound();
+
+            speedInMiliSecs = 50000000;
+            foodTolerance = 0;
+
+
+            if (food.getType().equals("speed")) {
+
+                eatSound();
+
+                // Will increase the speed
+                speedInMiliSecs = 300000;
+            } else if (food.getType().equals("double head")) {
+
+                eatSound();
+
+                foodTolerance = 10;
+            }
+
+            food.refreshFood();
+
+            handleInsaneMode();
+
+        } else {
+
+            snake.addHead(currentDirection);
+            snake.removeTail();
+        }
+    }
+
+    /**
+     * Will check if the head touches any of the points from its body
+     */
+    private void checkIfEatingItself() {
+
+
+        for (int i = 0; i < snake.getPoint().size() - 1; i++) {
+
+
+            if (snake.getHead().getxCord() != 0 && snake.getHead().getxCord() != canvas.getWidth() && snake.getHead().getyCord() != 0 && snake.getHead().getyCord() != canvas.getHeight()) {
+
+                if (snake.getHead().getxCord() == snake.getPoint().get(i).getxCord() && snake.getHead().getyCord() == snake.getPoint().get(i).getyCord()) {
+
+                    System.out.println("Snake was biting itself");
+                    gameOver = true;
+
+                }
+            }
+        }
+    }
+
+    /**
+     * This method will check if the tail is hitting the border coordinates and make the snake respawn in the opposite side of the screen.
+     */
+    private void checkBorders() {
+        // RIGHT BORDER
+        if (snake.getTail().getxCord() > canvas.getWidth() && currentDirection.get().equals("RIGHT")) {
+
+
+            System.out.println("Crossed the RIGHT border");
+            snake.setLocation(0, snake.getHead().getyCord());
+
+            // LEFT BORDER
+        } else if (snake.getTail().getxCord() < 1 && currentDirection.get().equals("LEFT")) {
+
+            System.out.println("Crossed the LEFT border");
+
+            snake.setLocation(canvas.getWidth(), snake.getHead().getyCord());
+        }
+        // TOP BORDER
+        else if (snake.getTail().getyCord() == 0 && currentDirection.get().equals("UP")) {
+
+            System.out.println("Crossed the UPPER border");
+            snake.setLocation(snake.getHead().getxCord(), canvas.getHeight());
+
+            // BOTTOM BORDER
+        } else if (snake.getTail().getyCord() == canvas.getHeight() && currentDirection.get().equals("DOWN")) {
+            System.out.println("Crossed the BOTTOM border");
+            snake.setLocation(snake.getHead().getxCord(), 0);
+        }
+    }
+
+    /**
+     * Will draw the snake on the canvas based on the snake array and amount of points contained. Will constantly be called by the Animation Timer to
+     * make it move smoothly on the canvas.
+     */
     private void drawSnake() {
 
 
@@ -245,32 +269,9 @@ public class Main extends Application {
     }
 
     /**
-     * Will check if the head touches any of the points from its body
+     * Used for restarting the game and resetting everything to the initial state. Points will be set to 0, snake length will be set
+     * to it's initial length, insane mode and effects will be reset as well.
      */
-
-    private void checkIfEatingItself() {
-
-
-        for (int i = 0; i < snake.getPoint().size() - 1; i++) {
-
-
-            if (snake.getHead().getxCord() != 0 && snake.getHead().getxCord() != canvas.getWidth() && snake.getHead().getyCord() != 0 && snake.getHead().getyCord() != canvas.getHeight()) {
-
-                if (snake.getHead().getxCord() == snake.getPoint().get(i).getxCord() && snake.getHead().getyCord() == snake.getPoint().get(i).getyCord()) {
-
-                    System.out.println("Snake was biting itself");
-                    gameOver = true;
-
-                }
-
-
-            }
-
-
-        }
-
-    }
-
     private void restartGame() {
 
         clearCanvas();
@@ -278,17 +279,20 @@ public class Main extends Application {
         currentDirection.set("RIGHT");
         speedInMiliSecs = 50000000;
         foodTolerance = 0;
-        insaneCounter=0;
+        insaneCounter = 0;
         gameOver = false;
         lengthOfSnake.textProperty().bind(snake.getSnakeSizeProperty().asString());
         scoreProperty.set(0);
         score.textProperty().bind(scoreProperty.asString());
         playBackgroundMelody("Media/backgroundmusic.mp3");
-        soundPlayAble=1;
+        soundPlayAble = 1;
 
 
     }
 
+    /**
+     * Will draw "Game Over" on the canvas
+     */
     private void drawGameOver() {
 
         gc = canvas.getGraphicsContext2D();
@@ -311,11 +315,17 @@ public class Main extends Application {
     }
 
 
+    /**
+     * Will clear the canvas. Used in the Animation Timer to update the canvas, so that the snake doesn't paint the whole canvas.
+     */
     private void clearCanvas() {
         gc.clearRect(0, 0, 700, 700);
     }
 
 
+    /**
+     * Will draw food on the canvas
+     */
     private void drawFood() {
 
         String type = food.getType();
@@ -348,6 +358,11 @@ public class Main extends Application {
     }
 
 
+    /**
+     * This handler will listen to the key events from the keyboard and change the direction of the snake, given that
+     * the conditions are fulfilled
+     * @param event
+     */
 
     public void handleKeys(KeyEvent event) {
 
@@ -361,7 +376,7 @@ public class Main extends Application {
                     break;
                 }
 
-                if (snake.getHead().getxCord()!=snake.getNeck().getxCord()){
+                if (snake.getHead().getxCord() != snake.getNeck().getxCord()) {
                     currentDirection.set("UP");
                     System.out.println("Pressed up");
 
@@ -375,7 +390,7 @@ public class Main extends Application {
                 }
 
 
-                if (snake.getHead().getxCord()!=snake.getNeck().getxCord()){
+                if (snake.getHead().getxCord() != snake.getNeck().getxCord()) {
                     currentDirection.set("DOWN");
                     System.out.println("Pressed down");
 
@@ -389,7 +404,7 @@ public class Main extends Application {
                     break;
                 }
 
-                if (snake.getHead().getyCord()!=snake.getNeck().getyCord()){
+                if (snake.getHead().getyCord() != snake.getNeck().getyCord()) {
 
                     currentDirection.set("LEFT");
                     System.out.println("Pressed left");
@@ -404,7 +419,7 @@ public class Main extends Application {
                 }
 
 
-                if (snake.getHead().getyCord()!=snake.getNeck().getyCord()){
+                if (snake.getHead().getyCord() != snake.getNeck().getyCord()) {
 
                     currentDirection.set("RIGHT");
                     System.out.println("Pressed right");
@@ -418,8 +433,6 @@ public class Main extends Application {
                 restartGame();
 
         }
-
-
     }
 
 
@@ -482,14 +495,16 @@ public class Main extends Application {
     }
 
 
-
-
     // SOUND EFFECTS
 
 
-    public void playBackgroundMelody(String path){
+    /**
+     * Play some music in the background
+     * @param path the source file
+     */
+    public void playBackgroundMelody(String path) {
 
-        if (musicplayer!=null){
+        if (musicplayer != null) {
 
             musicplayer.stop();
         }
@@ -503,26 +518,32 @@ public class Main extends Application {
 
     }
 
+
+    /**
+     * Will play the game over sound
+     */
+
     // USED TO PREVENT THE ANIMATION TIMER FROM RESTARTING THE SONG OVER AND OVER
     private int soundPlayAble = 1;
 
-    private void playGameOverSound(){
+    private void playGameOverSound() {
 
 
-
-        if (soundPlayAble==1){
+        if (soundPlayAble == 1) {
 
             playBackgroundMelody("Media/gameover.mp3");
             musicplayer.setCycleCount(1);
-            soundPlayAble=0;
+            soundPlayAble = 0;
         }
 
 
     }
 
+    /**
+     * Will play the eat sound
+     */
 
-
-    private void eatSound(){
+    private void eatSound() {
 
         Media soundEffect = new Media(getClass().getResource("Media/eatingSound.mp3").toExternalForm());
 
@@ -531,18 +552,7 @@ public class Main extends Application {
         mediaPlayerShort.setCycleCount(1);
 
 
-
     }
-
-
-
-
-
-
-
-
-
-
 
 
 }

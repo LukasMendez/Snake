@@ -13,15 +13,11 @@ public class Point {
     private double xCord;
     private double yCord;
 
-    private Circle circle;
-
 
     public Point(int xCord, int yCord){
 
         this.xCord=xCord;
         this.yCord=yCord;
-
-        circle = new Circle(3,RED);
 
     }
 

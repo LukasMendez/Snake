@@ -21,11 +21,17 @@ public class Food {
     }
 
 
+    /**
+     * Will construct the food object and assign a random coordinate to it
+     */
     public Food(){
         this.food = randomCoord();
     }
 
-    //
+    /**
+     * Will return a random point that is within the range of the stage dimensions
+     * @return a point object with x and y coordinates
+     */
     public Point randomCoord(){
         int xCord = (int)(Math.random() * 650);
         int yCord = (int)(Math.random() * 650);
@@ -37,6 +43,11 @@ public class Food {
         return point;
     }
 
+    /**
+     * There are three food types in this game. This method randomizes the output food based on probability.
+     * Normal food has 40% chance of spawning. Speed and Double Head has 30% chance of spawning.
+     *
+     */
 
     public void randomFood(){
 

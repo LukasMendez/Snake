@@ -17,10 +17,9 @@ public class Snake {
     int snakeSize;
     SimpleIntegerProperty snakeSizeProperty = new SimpleIntegerProperty();
 
-
-    private final StringProperty directionProperty = new SimpleStringProperty();
-
-
+    /**
+     * Initial state for the snake. Currently 11 points in total.
+     */
 
     public Snake(){
 
@@ -40,6 +39,11 @@ public class Snake {
 
     }
 
+    /**
+     * Used for replacing the snake on the canvas, whenever it hits the border
+     * @param xCord x coordinate
+     * @param yCord y coordinate
+     */
 
     public void setLocation(double xCord, double yCord){
 
@@ -54,7 +58,10 @@ public class Snake {
 
     }
 
-
+    /**
+     * Gets the points from the snake
+     * @return the ArrayList of the snake
+     */
     public ArrayList<Point> getPoint(){
 
         return theSnake;
@@ -62,13 +69,10 @@ public class Snake {
     }
 
 
-    public final String getName(){
-
-        return directionProperty.getName();
-
-    }
-
-
+    /**
+     * Will add a head to the direction given
+     * @param direction UP, DOWN, LEFT or RIGHT
+     */
     public void addHead(SimpleStringProperty direction){
 
 
@@ -100,17 +104,23 @@ public class Snake {
         }
 
         snakeSizeProperty.setValue(theSnake.size());
-
-
-
     }
 
 
+    /**
+     * Gets the size of the snake. Used for binding
+     * @return size of snake in IntegerProperty
+     */
     public IntegerProperty getSnakeSizeProperty(){
 
         return snakeSizeProperty;
 
     }
+
+    /**
+     * Neck is the point behind the head
+     * @return a Point
+     */
 
     public Point getNeck(){
 
@@ -118,6 +128,10 @@ public class Snake {
 
     }
 
+    /**
+     * The front element in the ArrayList
+     * @return a Point
+     */
 
     public Point getHead(){
 
@@ -126,11 +140,19 @@ public class Snake {
     }
 
 
+    /**
+     * The first element of the ArrayList
+     * @return a Point
+     */
+
     public Point getTail(){
 
         return theSnake.get(0);
     }
 
+    /**
+     * Remove the first element on the snake ArrayList
+     */
 
     public void removeTail(){
         theSnake.remove(0);
