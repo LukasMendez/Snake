@@ -1,9 +1,12 @@
 
 import javafx.animation.*;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -19,6 +22,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 /**
  * Created by Lukas
@@ -203,6 +207,15 @@ public class Main extends Application {
 
             }
         }.start();
+
+
+        // WILL MAKE SURE TO KILL ALL THREADS WHEN CLOSING THE WINDOW
+        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            public void handle(WindowEvent we) {
+                System.out.println("Stage is closing");
+                System.exit(0);
+            }
+        });
 
 
         primaryStage.setResizable(false);
@@ -467,6 +480,8 @@ public class Main extends Application {
         rotate.setPivotY(350);
         canvas.getTransforms().add(rotate);
     }
+
+
 
 
     // SOUND EFFECTS
