@@ -251,7 +251,7 @@ public class Main extends Application {
     private void drawSnake() {
 
 
-        for (int i = 0; i < snake.getPoint().size() - 1; i++) {
+        for (int i = 0; i < snake.getPoint().size() - 1; i++) { // -1 to exclude head
 
             gc.setFill(Color.DARKGREEN);
 
@@ -259,8 +259,8 @@ public class Main extends Application {
 
         }
 
+        //manipulating the head
         gc.setFill(Color.LIMEGREEN);
-
         canvas.getGraphicsContext2D().fillRect(
                 snake.getHead().getxCord() - foodTolerance,
                 snake.getHead().getyCord() - foodTolerance,
@@ -327,34 +327,26 @@ public class Main extends Application {
      * Will draw food on the canvas
      */
     private void drawFood() {
-
         String type = food.getType();
 
         if (type.equals("normal")) {
-
-            gc = canvas.getGraphicsContext2D();
-
-            gc.setFill(Color.ORANGE);
-            canvas.getGraphicsContext2D().fillOval(food.getFood().getxCord(), food.getFood().getyCord(), 10, 10);
-
-
+            drawFoodHelper(Color.ORANGE, 10, 10);
         } else if (type.equals("speed")) {
-
-            gc = canvas.getGraphicsContext2D();
-
-            gc.setFill(Color.BLUE);
-            canvas.getGraphicsContext2D().fillOval(food.getFood().getxCord(), food.getFood().getyCord(), 10, 10);
-
+            drawFoodHelper(Color.BLUE, 10, 10);
         } else if (type.equals("double head")) {
-
-            gc = canvas.getGraphicsContext2D();
-
-            gc.setFill(Color.PURPLE);
-            canvas.getGraphicsContext2D().fillOval(food.getFood().getxCord(), food.getFood().getyCord(), 10, 10);
-
+            drawFoodHelper(Color.PURPLE, 10, 10);
         }
+    }
 
-
+    /**
+     * helper method for drawing food. Used in drawFood()
+     * @param color the color of the food to be drawn
+     * @param width width of food
+     * @param height height of food
+     */
+    private void drawFoodHelper(Color color, int width, int height){
+        gc.setFill(color);
+        canvas.getGraphicsContext2D().fillOval(food.getFood().getxCord(), food.getFood().getyCord(), width, height);
     }
 
 
@@ -435,7 +427,10 @@ public class Main extends Application {
         }
     }
 
-
+    /**
+     * Counting each time the snake eats food. Starting insane mode when the snake eats food while the counter
+     * is 5. Rotates the canvas 90 degrees and displays animation.
+     */
     public void handleInsaneMode() {
         Canvas overlay = new Canvas(canvas.getWidth(), canvas.getHeight());
         GraphicsContext overlayGc = overlay.getGraphicsContext2D();
@@ -443,50 +438,51 @@ public class Main extends Application {
         Font insaneFont = new Font("Arial Black", 50);
         Font insaneBigFont = new Font("Arial Black", 60);
         Color[] colorArray = {Color.RED, Color.LIMEGREEN, Color.ALICEBLUE, Color.ANTIQUEWHITE};
-        if (insaneCounter < 5) {
+        if (insaneCounter < 5) { //if counter < 5 then increment
             insaneCounter += 1;
-        } else if (insaneCounter == 5) {
-
+        } else if (insaneCounter == 5) { //if counter = 5 then rotate and start animationTimer
             musicplayer.stop();
             playBackgroundMelody("Media/mario.mp3");
-
             root.setStyle("-fx-background-color: #2e0044");
             insaneRotation(90);
+
             new AnimationTimer() {
                 int lastUpdate = 0;
-
                 @Override
                 public void handle(long now) {
-                    if (now - lastUpdate >= 50000000 && insaneCounter == 6 && !gameOver) {
-                        int random = (int) (Math.random() * 4);
-                        overlayGc.setFill(colorArray[random]);
-                        overlayGc.setTextAlign(TextAlignment.CENTER);
-                        random = (int) (Math.random() * 10);
+                    if (now - lastUpdate >= 50000000 && insaneCounter == 6 && !gameOver) { //update per 50ms while counter = 6 and not dead
+                        int random = (int) (Math.random() * 4); //random number for setting text color
+                        overlayGc.setFill(colorArray[random]); //setting text color
+                        overlayGc.setTextAlign(TextAlignment.CENTER); //center text
+                        random = (int) (Math.random() * 10); //random number for increasing text size (twitch effect)
                         if (random > 8) {
-                            overlayGc.setFont(insaneBigFont);
+                            overlayGc.setFont(insaneBigFont); //set large text size
                         } else {
-                            overlayGc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-                            overlayGc.setFont(insaneFont);
+                            overlayGc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight()); //clear previous so big font doesnt "stick"
+                            overlayGc.setFont(insaneFont); //set normal text size
                         }
-                        overlayGc.fillText("INSANE MODE!", canvas.getWidth() / 2, canvas.getHeight() / 2);
-                    } else {
-                        overlayGc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-                        insaneRotation(-90);
-
+                        overlayGc.fillText("INSANE MODE!", canvas.getWidth() / 2, canvas.getHeight() / 2); //drawing the text
+                    } else { //ending insane mode. If counter is no longer 6 or gameOver = true
+                        overlayGc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight()); //clearing the canvas
+                        insaneRotation(-90); //changing the rotation back to normal
                         musicplayer.stop();
                         playBackgroundMelody("Media/backgroundmusic.mp3");
                         root.setStyle("-fx-background-color: BLACK");
-                        stop();
+                        stop(); //stopping the animationTimer
                     }
                 }
             }.start();
             insaneCounter += 1;
-        } else if (insaneCounter == 6) {
+        } else if (insaneCounter == 6) { //if counter = 6 then reset counter
             insaneCounter = 0;
         }
         System.out.println("insane: " + insaneCounter);
     }
 
+    /**
+     * helper method for rotating the canvas. Used in handleInsaneMode()
+     * @param angle
+     */
     public void insaneRotation(int angle) {
         Rotate rotate = new Rotate(angle);
         rotate.setPivotX(350);
