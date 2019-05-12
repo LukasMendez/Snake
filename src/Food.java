@@ -1,3 +1,6 @@
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -9,7 +12,9 @@ public class Food {
 
     private String type = "normal";
     private Point food;
+    private int refreshFoodTimeInSec = 8;
     Timer timer = new Timer();
+    Timer timerRefreshFoodTimerLeftTime = new Timer();
 
 
     public Point getFood() {
@@ -83,6 +88,11 @@ public class Food {
         // Calls the food timer, to repeat the timer, after it has been cancelled.
         refreshFoodTimer();
 
+        timerRefreshFoodTimerLeftTime.cancel();
+        timerRefreshFoodTimerLeftTime.purge();
+        timerRefreshFoodTimerLeftTime = new Timer();
+        refreshFoodTimerLeftTime();
+
 
 
         randomFood();
@@ -103,10 +113,36 @@ public class Food {
                 // purges the timer cache to clean up stuff (saves memory)
                 timer.purge();
                 System.out.println("New food has been served! Bon appetit :)");
+                // Calls the another food timer, that shows how many seconds there are left before food is respawning.
+
+
             }
-        }, 8*1000);
+        }, refreshFoodTimeInSec*1000);
     }
 
+    public void refreshFoodTimerLeftTime(){
+        TimerTask task = new TimerTask()
+        {
+            int seconds = refreshFoodTimeInSec;
+            int i = 0;
+            @Override
+            public void run()
+            {
+                i++;
+
+                if(i % seconds == 0)
+                    System.out.println("RESPAWNING");
+                else
+                    System.out.println("Time left:" + (seconds - (i %seconds)) );
+                
+
+            }
+        };
+
+        // Timer
+        // timerRefreshFoodTimerLeftTime = new Timer();
+        timerRefreshFoodTimerLeftTime.schedule(task,0,1000 );
+    }
 
 
 

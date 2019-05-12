@@ -39,6 +39,9 @@ public class Main extends Application {
     private Label scoreLabel = new Label("Score: ");
     private Label score = new Label();
 
+    private Label refreshFoodTimerLeftTimeLabel = new Label();
+    private Label refreshFoodTimerLeftTime = new Label();
+
 
     private Snake snake = new Snake();
     private Food food = new Food();
@@ -83,6 +86,11 @@ public class Main extends Application {
         scoreLabel.setText("   Score: ");
         score.textProperty().bind(scoreProperty.asString());
 
+        refreshFoodTimerLeftTimeLabel.setTextFill(Color.WHITE);
+        refreshFoodTimerLeftTime.setTextFill(Color.WHITE);
+        refreshFoodTimerLeftTimeLabel.setText("   New food spawns in: ");
+
+
 
         // This calls the timer method found in the food class
         // This will be called a single time to start the timer process/thread
@@ -90,13 +98,14 @@ public class Main extends Application {
         // Then the timer will first get initialized after the player ate his first fruit...
         System.out.println("Timer initialized...");
         food.refreshFoodTimer();
+        food.refreshFoodTimerLeftTime();
 
 
         // HBox settings
         hBox.setPrefHeight(30);
         hBox.setStyle("-fx-background-color: rgba(47,47,47,0.86)");
         hBox.setAlignment(Pos.CENTER);
-        hBox.getChildren().addAll(lengthOfSnakeLabel, lengthOfSnake, scoreLabel, score);
+        hBox.getChildren().addAll(lengthOfSnakeLabel, lengthOfSnake, scoreLabel, score, refreshFoodTimerLeftTimeLabel);
 
 
         // Default direction when you start the game
@@ -218,27 +227,27 @@ public class Main extends Application {
      */
     private void checkBorders() {
         // RIGHT BORDER
-        if (snake.getTail().getxCord() > canvas.getWidth() && currentDirection.get().equals("RIGHT")) {
+        if (snake.getHead().getxCord() > canvas.getWidth() && currentDirection.get().equals("RIGHT")) {
 
 
             System.out.println("Crossed the RIGHT border");
             snake.setLocation(0, snake.getHead().getyCord());
 
             // LEFT BORDER
-        } else if (snake.getTail().getxCord() < 1 && currentDirection.get().equals("LEFT")) {
+        } else if (snake.getHead().getxCord() < 1 && currentDirection.get().equals("LEFT")) {
 
             System.out.println("Crossed the LEFT border");
 
             snake.setLocation(canvas.getWidth(), snake.getHead().getyCord());
         }
         // TOP BORDER
-        else if (snake.getTail().getyCord() == 0 && currentDirection.get().equals("UP")) {
+        else if (snake.getHead().getyCord() == 0 && currentDirection.get().equals("UP")) {
 
             System.out.println("Crossed the UPPER border");
             snake.setLocation(snake.getHead().getxCord(), canvas.getHeight());
 
             // BOTTOM BORDER
-        } else if (snake.getTail().getyCord() == canvas.getHeight() && currentDirection.get().equals("DOWN")) {
+        } else if (snake.getHead().getyCord() == canvas.getHeight() && currentDirection.get().equals("DOWN")) {
             System.out.println("Crossed the BOTTOM border");
             snake.setLocation(snake.getHead().getxCord(), 0);
         }
